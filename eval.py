@@ -2,6 +2,7 @@ import csv
 import pandas as pd
 import argparse
 
+# 按照岗位描述对岗位进行分类
 
 def recall_at_k(label_list, prediction_list, k):
     correct_recall = 0
