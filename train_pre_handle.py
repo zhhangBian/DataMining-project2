@@ -12,7 +12,7 @@ print(len(train_data))
 
 for i in range(10495, len(train_data)):
     train_data.loc[i, 'job_description_summary'] = (
-        get_job_description_summary(train_data['job_title'][i], train_data['job_description'][i]))
+        get_job_description_summary(train_data['job_title'][i], train_data['job_description'][i][0:3800]))
 
     print(str(i) + ": " + train_data.loc[i, 'job_description_summary'])
     train_data.to_csv("new_train.csv")
