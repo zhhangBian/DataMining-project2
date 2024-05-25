@@ -20,17 +20,22 @@ def recall_at_k(label_list, prediction_list, k):
     return recall
 
 
-parser = argparse.ArgumentParser(description="Process a list of texts with BERT")
-parser.add_argument("--pre_path", type=str)
-parser.add_argument("--test_path", type=str)
-args = parser.parse_args()
+def eval_job_classify():
+    parser = argparse.ArgumentParser(description="Process a list of texts with BERT")
+    parser.add_argument("--pre_path", type=str)
+    parser.add_argument("--test_path", type=str)
+    args = parser.parse_args()
 
-testdata = pd.read_csv(args.test_path)
-label_list = list(testdata['position_name'])
-predictdata = pd.read_csv(args.pre_path)
-predict_list = list(predictdata['Prediction'])
-predict_list = [eval(x) for x in predict_list]
-print(recall_at_k(label_list, predict_list, 1))
-print(recall_at_k(label_list, predict_list, 3))
-print(recall_at_k(label_list, predict_list, 5))
-print(recall_at_k(label_list, predict_list, 10))
+    testdata = pd.read_csv(args.test_path)
+    label_list = list(testdata['position_name'])
+    predictdata = pd.read_csv(args.pre_path)
+    predict_list = list(predictdata['Prediction'])
+    predict_list = [eval(x) for x in predict_list]
+    print(recall_at_k(label_list, predict_list, 1))
+    print(recall_at_k(label_list, predict_list, 3))
+    print(recall_at_k(label_list, predict_list, 5))
+    print(recall_at_k(label_list, predict_list, 10))
+
+
+if __name__ == "__main__":
+    eval_job_classify()

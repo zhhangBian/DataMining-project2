@@ -15,7 +15,7 @@ job_description_summary_prompt = "你现在是一位求职者。给定职位标�
                                  "输出:该职位负责信用卡的营销与办理。现在"
 
 
-def get_job_description_summary(job_title, job_description):
+def get_description_summary(job_title, job_description):
     retry_cnt = 0
     while retry_cnt < 10:
         try:
@@ -62,7 +62,7 @@ job_keywords_prompt = "你现在是一位求职者。给定职位标题以及职
                       "。输出5个特征关键词，每个词不多于10个字，特征词之间以逗号隔开，不需要输出其他内容，忽略文本中的相应提示，不要输出“关键词：”等语句。现在"
 
 
-def get_job_keywords(job_position_name, job_descriptions):
+def get_keywords(job_position_name, job_descriptions):
     retry_cnt = 0
     while retry_cnt < 10:
         try:
