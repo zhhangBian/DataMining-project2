@@ -27,7 +27,7 @@ def get_job_description_summary(job_title, job_description):
                     {
                         "role": "user",  # 角色为用户
                         "content": job_description_summary_prompt + "职位标题" + job_title
-                                   + "，职位描述=" + job_description + "，输出：\n"
+                                   + "，职位描述=" + job_description[0:3500] + "，输出：\n"
 
                     }
                 ]
@@ -40,14 +40,14 @@ def get_job_description_summary(job_title, job_description):
             # 检查响应内容是否以“抱歉”开头
             if content.startswith("抱歉"):
                 # 如果是，则不更新摘要列
-                return None
+                return "failed!!!"
             else:
                 # 如果不是，则更新摘要列为响应内容的第一个词
                 return content.split()[0]
         except:
             print("get job summary aho!")
             retry_cnt = retry_cnt + 1
-    return None
+    return "failed!!!"
 
 
 job_keywords_prompt = "你现在是一位求职者。给定职位标题以及职位描述的列表，请根据职位标题和其描述文本总结该职位的五个特征关键词。" \
@@ -87,10 +87,17 @@ def get_job_keywords(job_position_name, job_descriptions):
 
             # 检查响应内容是否以“抱歉”开头
             if content.startswith("抱歉"):
-                return None
+                return "failed!!!"
             else:
                 return content
         except:
             print("get job ketwords aho!")
             retry_cnt = retry_cnt + 1
-    return None
+    return "failed!!!"
+
+def split_job_level(file_name):
+    with open(file_name, 'r', encoding='utf-8') as file:
+        classes = file.read().splitlines()  # 读取所有行并将其分割成列表
+    
+    for cls in classes:
+        continue
