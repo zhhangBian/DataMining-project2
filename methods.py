@@ -7,6 +7,8 @@ headers = {
     'Authorization': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IiIsInV1aWQiOiJuYmdfY3NsX3BhcnRuZXJfcGxheWVyOS02NTkzNDhlZS1lZDcyLTQxZGEtYWYwZi05N2E2MGE1MGExMGUifQ.9hTvhNxwncrLvVPG-utFFdUmZDNXA3YmvkWl-RGDJm8'
 }
 
+fail_hint = "failed!!!"
+
 job_description_summary_prompt = "你现在是一位求职者。给定职位标题以及职位描述，请根据职位标题和其描述文本总结该职位负责的工作任务。" \
                                  "要求是只需要回答职位负责的是什么，不要补充其他内容，尽量从A和B中选出词语进行描述，字数不超过40，回答模版为:该职位负责...。" \
                                  "比如当职位标题='信用卡销售'，职位描述='1.负责华夏银行信用卡的营销与办理 2.工作方式自由 3.任务轻松，每天三个，月入过万'，" \
@@ -40,14 +42,14 @@ def get_job_description_summary(job_title, job_description):
             # 检查响应内容是否以“抱歉”开头
             if content.startswith("抱歉"):
                 # 如果是，则不更新摘要列
-                return "failed!!!"
+                return fail_hint
             else:
                 # 如果不是，则更新摘要列为响应内容的第一个词
                 return content.split()[0]
         except:
-            print("get job summary aho!")
+            print("get job summary aho " + str(retry_cnt))
             retry_cnt = retry_cnt + 1
-    return "failed!!!"
+    return fail_hint
 
 
 job_keywords_prompt = "你现在是一位求职者。给定职位标题以及职位描述的列表，请根据职位标题和其描述文本总结该职位的五个特征关键词。" \
@@ -62,11 +64,11 @@ job_keywords_prompt = "你现在是一位求职者。给定职位标题以及职
 
 def get_job_keywords(job_position_name, job_descriptions):
     retry_cnt = 0
-    while retry_cnt < 100:
+    while retry_cnt < 10:
         try:
             payload = json.dumps({
                 "model": "Nanbeige-16B-Chat-plus",  # 指定使用的模型
-                "max_tokens": 40960,  # 最大令牌数限制
+                "max_tokens": 4096,  # 最大令牌数限制
                 "temperature": 0.7,
                 "top_p": 1,
                 "output_accumulate": True,
@@ -74,8 +76,7 @@ def get_job_keywords(job_position_name, job_descriptions):
                     {
                         "role": "user",  # 角色为用户
                         "content": job_keywords_prompt + "岗位名称为：" + job_position_name
-                                   + "，所包含的具体职位描述列表如下:"
-                                   + job_descriptions[0:3000]
+                                   + "，所包含的具体职位描述列表如下:" + job_descriptions[0:3000]
 
                     }
                 ]
@@ -87,17 +88,10 @@ def get_job_keywords(job_position_name, job_descriptions):
 
             # 检查响应内容是否以“抱歉”开头
             if content.startswith("抱歉"):
-                return "failed!!!"
+                return fail_hint
             else:
                 return content
         except:
-            print("get job ketwords aho!")
+            print("get job ketwords aho " + str(retry_cnt))
             retry_cnt = retry_cnt + 1
-    return "failed!!!"
-
-def split_job_level(file_name):
-    with open(file_name, 'r', encoding='utf-8') as file:
-        classes = file.read().splitlines()  # 读取所有行并将其分割成列表
-    
-    for cls in classes:
-        continue
+    return fail_hint
