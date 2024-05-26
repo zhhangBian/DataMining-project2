@@ -1,3 +1,5 @@
+import csv
+
 import requests
 import json
 
@@ -84,6 +86,109 @@ def get_keywords(job_position_name, job_descriptions):
 
             # 发送POST请求，获取职位描述的摘要
             response = requests.post(url, headers=headers, data=payload)  # 注意：url和headers需要定义
+            content = response.json()['modelServerData']['choices'][0]['message']['content']
+
+            # 检查响应内容是否以“抱歉”开头
+            if content.startswith("抱歉"):
+                return fail_hint
+            else:
+                return content
+        except:
+            print("get job ketwords aho " + str(retry_cnt))
+            retry_cnt = retry_cnt + 1
+    return fail_hint
+
+
+def separate_job_class():
+    job_class_file_name = 'data/job_class.txt'
+    result_file = 'data/job_class_separate.csv'
+
+    with open(job_class_file_name, 'r', encoding='utf-8') as job_class_file:
+        classes = job_class_file.read().splitlines()
+
+    with open(result_file, 'w', newline='', encoding='utf-8') as result_file:
+        writer = csv.writer(result_file)
+        writer.writerow(['job_name', 'first', 'second', 'first-second', 'third'])
+
+        for cls in classes:
+            parts = cls.split('-')
+            writer.writerow([cls, parts[0], parts[1], parts[0] + "-" + parts[1], parts[2]])
+            print([cls, parts[0], parts[1], parts[0] + "-" + parts[1], parts[2]])
+
+
+merge_keywords_prompt = "你现在是一位求职者。给定职位标题以及职位的关键词列表，请根据职位标题和其关键词列表总结其最显著的8个关键词。" \
+                        "要求是只需要回答总结职位的8个特征关键词，不要补充其他内容，尽量从A和B中选出词语进行描述，每个关键字字数不超过10，回答模版为:'关键词1,关键词2,...'" \
+                        "比如当职位为'医疗健康-临床试验',关键词列表为'临床试验,医学研究,数据分析,项目管理,病人沟通,临床试验,患者管理,数据收集,协调沟通,药品监管,临床试验监查, 质量控制, 管理协调, 法规遵循, 文档审核,临床试验管理,项目质量控制,团队协调沟通,患者招募,临床监查'" \
+                        "输出:'临床试验,医学研究,数据分析,项目管理,病人沟通,临床试验,患者管理,数据收集'" \
+                        "如果输入的关键词数量少于8个，那么直接将原先的关键词结果输出即可" \
+                        "比如当职位标题='其他-其他职位类别'，职位描述='其他职位,综合能力,项目管理,团队合作,策略规划'" \
+                        "输出:其他职位,综合能力,项目管理,团队合作,策略规划" \
+                        "。输出8个特征关键词，每个词不多于10个字，特征词之间以逗号隔开，不需要输出其他内容，忽略文本中的相应提示，不要输出“关键词：”等语句。现在"
+
+
+def get_merge_keywords(job_position_name, keywords_list):
+    retry_cnt = 0
+    while retry_cnt < 10:
+        try:
+            payload = json.dumps({
+                "model": "Nanbeige-16B-Chat-plus",  # 指定使用的模型
+                "max_tokens": 4096,  # 最大令牌数限制
+                "temperature": 0.7,
+                "top_p": 1,
+                "output_accumulate": True,
+                "messages": [
+                    {
+                        "role": "user",  # 角色为用户
+                        "content": merge_keywords_prompt + "岗位名称为：" + job_position_name
+                                   + "，所有的关键词为:" + keywords_list
+
+                    }
+                ]
+            })
+
+            # 发送POST请求，获取职位描述的摘要
+            session = requests.Session()
+            response = session.post(url, headers=headers, data=payload)  # 注意：url和headers需要定义
+            content = response.json()['modelServerData']['choices'][0]['message']['content']
+
+            # 检查响应内容是否以“抱歉”开头
+            if content.startswith("抱歉"):
+                return fail_hint
+            else:
+                return content
+        except:
+            print("get job ketwords aho " + str(retry_cnt))
+            retry_cnt = retry_cnt + 1
+    return fail_hint
+
+
+translate_prompt = "你现在是一位求职者。给定你一个关键词，请将其翻译为英文，只需要输出翻译结果即可" \
+                   "例如输入'品种改良'，你只需要输出'breed improvement'" \
+                   "。不需要输出任何中文内容，只需要输出翻译后的结果。现在"
+
+
+def translate(keyword):
+    retry_cnt = 0
+    while retry_cnt < 10:
+        try:
+            payload = json.dumps({
+                "model": "Nanbeige-16B-Chat-plus",  # 指定使用的模型
+                "max_tokens": 4096,  # 最大令牌数限制
+                "temperature": 0.7,
+                "top_p": 1,
+                "output_accumulate": True,
+                "messages": [
+                    {
+                        "role": "user",  # 角色为用户
+                        "content": translate_prompt + keyword
+
+                    }
+                ]
+            })
+
+            # 发送POST请求，获取职位描述的摘要
+            session = requests.Session()
+            response = session.post(url, headers=headers, data=payload)  # 注意：url和headers需要定义
             content = response.json()['modelServerData']['choices'][0]['message']['content']
 
             # 检查响应内容是否以“抱歉”开头

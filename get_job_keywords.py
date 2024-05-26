@@ -10,7 +10,7 @@ job_class_file = 'data/job_class.txt'
 
 def get_job_keywords():
     with open(job_class_file, 'r', encoding='utf-8') as file:
-        classes = file.read().splitlines()  # 读取所有行并将其分割成列表
+        classes = file.read().splitlines()
 
     train_pd = pd.read_csv(train_data_file)
     descriptions_by_class = train_pd.groupby('position_name')['job_description_summary'].apply(list).to_dict()
