@@ -164,7 +164,7 @@ def get_merge_keywords(job_position_name, keywords_list):
 
 translate_prompt = "你现在是一位求职者。给定你一个关键词，请将其翻译为英文，只需要输出翻译结果即可" \
                    "例如输入'品种改良'，你只需要输出'breed improvement'" \
-                   "。不需要输出任何中文内容，只需要输出翻译后的结果。现在"
+                   "。不需要输出任何中文内容，只需要输出翻译后的结果。现在中文为："
 
 
 def translate(keyword):
