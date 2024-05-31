@@ -7,12 +7,11 @@ from tqdm import tqdm
 def get_most_similar_words(fac_key_words, fac_targets):
     # key_words = [[1,2,3,4,5],[1,2,3,4,5]]
     # targets = [[6,7,8,9,10]]
-    num = 0
+    # num = 0
     result = []
     for target in tqdm(fac_targets):
-
-        if num == 10:
-            break
+        # if num == 10:
+        #     break
         fac_key_words.append(target)
         model = Word2Vec(fac_key_words, min_count=1, workers=4)
         similar_words = []
@@ -20,7 +19,7 @@ def get_most_similar_words(fac_key_words, fac_targets):
             similar_words.append(model.wv.most_similar(word)[0][0])
         result.append(similar_words)
         fac_key_words.pop(-1)
-        num = num + 1
+        # num = num + 1
     return result
 
 
