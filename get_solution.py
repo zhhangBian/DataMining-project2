@@ -72,7 +72,10 @@ def get_solution():
         frequency_dict = {}
 
         for word in words:
-            traces = en_job_reflect[word]
+            try:
+                traces = en_job_reflect[word]
+            except:
+                continue
             for trace in traces:
                 if trace not in frequency_dict:
                     frequency_dict[trace] = 1
@@ -83,7 +86,7 @@ def get_solution():
 
     print(result_list)
     result = pd.Series(result_list)
-    result.to_csv(result_file, header=['id', 'job'], index_label='id')
+    result.to_csv(result_file)
 
 
 if __name__ == "__main__":
