@@ -1,5 +1,5 @@
 import csv
-# from gensim.models import Word2Vec
+from gensim.models import Word2Vec
 import requests
 import json
 
@@ -202,16 +202,16 @@ def translate(keyword):
     return fail_hint
 
 
-# def get_most_similar_words(key_words, targets):
-#     # key_words = [[1,2,3,4,5],[1,2,3,4,5]]
-#     # targets = [[6,7,8,9,10]]
-#     res = [[]]
-#     for target in targets:
-#         key_words.append(target)
-#         model = Word2Vec(key_words, min_count=1, workers=4)
-#         similar_words = []
-#         for word in target:
-#             similar_words.append(model.wv.most_similar(word))
-#         res.append(similar_words)
-#         key_words.pop(-1)
-#     return res
+def get_most_similar_words(key_words, targets):
+    # key_words = [[1,2,3,4,5],[1,2,3,4,5]]
+    # targets = [[6,7,8,9,10]]
+    res = [[]]
+    for target in targets:
+        key_words.append(target)
+        model = Word2Vec(key_words, min_count=1, workers=4)
+        similar_words = []
+        for word in target:
+            similar_words.append(model.wv.most_similar(word))
+        res.append(similar_words)
+        key_words.pop(-1)
+    return res
