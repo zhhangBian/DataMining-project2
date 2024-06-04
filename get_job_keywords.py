@@ -1,4 +1,5 @@
 import pandas as pd
+from tqdm import tqdm
 
 from methods import get_keywords
 
@@ -19,13 +20,13 @@ def get_job_keywords():
     class_description_dict = {cls: descriptions_by_class.get(cls, []) for cls in classes}
 
     result = []
-    for position_name, job_descriptions in class_description_dict.items():
+    for position_name, job_descriptions in tqdm(class_description_dict.items()):
         job_keywords = get_keywords(position_name, str(job_descriptions))
         result.append((position_name, job_descriptions, job_keywords))
         print(position_name + ": " + job_keywords)
 
-    df_keywords = pd.DataFrame(result, columns=['position_name', 'job_descriptions', 'job_keywords'])
-    df_keywords.to_csv(job_keywords_file, index=False, encoding='utf-8-sig')
+    keywords_result = pd.DataFrame(result, columns=['position_name', 'job_descriptions', 'job_keywords'])
+    keywords_result.to_csv(job_keywords_file, index=False, encoding='utf-8-sig')
 
 
 if __name__ == "__main__":

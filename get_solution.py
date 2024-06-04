@@ -5,8 +5,8 @@ from tqdm import tqdm
 
 
 def get_most_similar_words(fac_key_words, fac_targets):
-    # key_words = [[1,2,3,4,5],[1,2,3,4,5]]
-    # targets = [[6,7,8,9,10]]
+    # key_words = [[1,2,3,4,5],[1,2,3,4,5]]  data
+    # targets = [[6,7,8,9,10]]  test
     # num = 0
     result = []
     for target in tqdm(fac_targets):
@@ -48,6 +48,7 @@ def get_solution():
     for row in simplify_data.to_dict('records'):
         keywords_ch = row['job_keywords'].split(',')
         keywords_en = ast.literal_eval(row['translate_keywords'])
+        print("------" + str(keywords_en))
         position_name = row['position_name']
 
         key_words.append(keywords_en)
@@ -86,7 +87,7 @@ def get_solution():
 
     print(result_list)
     result = pd.Series(result_list)
-    result.to_csv(result_file)
+    # result.to_csv(result_file)
 
 
 if __name__ == "__main__":
