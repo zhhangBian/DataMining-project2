@@ -36,6 +36,6 @@ def eval_job_classify():
     print(recall_at_k(label_list, predict_list, 5))
     print(recall_at_k(label_list, predict_list, 10))
 
-
+# python eval.py --pre_path data/result.csv --test_path data/test.csv
 if __name__ == "__main__":
     eval_job_classify()
