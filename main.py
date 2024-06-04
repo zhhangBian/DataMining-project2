@@ -1,5 +1,3 @@
-import nltk.translate.bleu_score
-
 from eval import eval_job_classify
 from get_job_description_summary import get_job_description_summary
 from get_job_keywords import get_job_keywords

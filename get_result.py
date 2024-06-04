@@ -1,83 +1,68 @@
 import nltk
 from tqdm import tqdm
+import pandas as pd
+import ast
+
+position_keywords_file = "./data/position_keywords.csv"
+test_keywords_file = "./data/test_keywords.csv"
+result_file = "data/result.csv"
 
 
-def find_top_five_indices(nums):
-    res = []
+def find_top_similar_job_list(similarity_list, num=10):
+    job_index_list = []
     reflect = {}
-    for i in range(len(nums)):
-        reflect[nums[i]] = i
-    nums.sort(reverse=True)
-    for i in range(5):
-        res.append(reflect[nums[i]])
-    return res
+    for i in range(len(similarity_list)):
+        reflect[similarity_list[i]] = i
+
+    similarity_list.sort(reverse=True)
+    for i in range(num):
+        job_index_list.append(reflect[similarity_list[i]])
+    return job_index_list
 
 
 def get_most_similar_words(fac_key_words, fac_targets):
-    # key_words = [[1,2,3,4,5],[1,2,3,4,5]]
-    # targets = [[6,7,8,9,10]]
-    # print(fac_key_words)
-    # print(fac_targets)
-    num = 0
     result = []
     for target in tqdm(fac_targets):
-        # if num == 10:
-        #     break
-        num += 1
-
-        scores = []
+        similarity_list = []
         for my_word in fac_key_words:
-            # print([[a_word for phrase in my_word for a_word in phrase.split()]])
-            # print([[a_word for phrase in target for a_word in phrase.split()]])
-            scores.append(nltk.translate.bleu_score.sentence_bleu(
+            similarity_list.append(nltk.translate.bleu_score.sentence_bleu(
                 [[a_word for phrase in my_word for a_word in phrase.split()]],
                 [a_word for phrase in target for a_word in phrase.split()])
             )
-            # print(scores)
-            # return None
-        result.append(find_top_five_indices(scores))
+        result.append(find_top_similar_job_list(similarity_list))
     return result
 
 
 def get_result():
-    import pandas as pd
-    df = pd.read_csv('./data/position_keywords.csv')
+    position_keywords_data = pd.read_csv(position_keywords_file)
 
-    tmp = df.loc[:, ['job_keywords', 'translate_keywords', 'position_name']]
+    key_words_list = []
 
-    import ast
-    en_ch_reflect = {}
-    en_job_reflect = {}
-    key_words = []
-    for row in tmp.to_dict('records'):
-        ch = row['job_keywords'].split(',')
-        en = ast.literal_eval(row['translate_keywords'])
-        job = row['position_name']
-        key_words.append(en)
-        for i in range(len(en)):
-            en_ch_reflect[en[i]] = ch[i]
-            if en[i] in en_job_reflect:
-                en_job_reflect[en[i]].append(job)
-            else:
-                en_job_reflect[en[i]] = [job]
+    select_row = position_keywords_data.loc[:, ['job_keywords',
+                                                'translate_keywords',
+                                                'position_name']]
+    for row in select_row.to_dict('records'):
+        # 转换类型为列表
+        job_keywords_list_en = ast.literal_eval(row['translate_keywords'])
+        key_words_list.append(job_keywords_list_en)
 
-    ts_df = pd.read_csv('./data/test_keywords.csv')
-    tmp = pd.read_csv('./data/position_keywords.csv')
-    tmp = tmp.loc[:, 'position_name']
-    jobs = tmp.tolist()
+    test_keywords_data = pd.read_csv(test_keywords_file)
+
     targets = []
-    for row in ts_df.to_dict('records'):
+    position_name_list = position_keywords_data.loc[:, 'position_name'].tolist()
+    for row in test_keywords_data.to_dict('records'):
         targets.append(ast.literal_eval(row['translate_keywords']))
 
-    word_res = get_most_similar_words(key_words, targets)
-    final_res = []
-    for f_res in word_res:
-        temp = []
-        for f in f_res:
-            temp.append(jobs[f])
-        final_res.append(temp)
+    most_similarity_list = get_most_similar_words(key_words_list, targets)
 
-    pd.Series(final_res).to_csv('data/result.csv')
+    result_data = []
+    for job_id_list in most_similarity_list:
+        test_prediction = []
+        for job_id in job_id_list:
+            test_prediction.append(position_name_list[job_id])
+        result_data.append(test_prediction)
+
+    pd.Series(result_data).to_csv(result_file)
 
 
 if __name__ == "__main__":
