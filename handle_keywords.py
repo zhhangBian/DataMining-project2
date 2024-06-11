@@ -11,7 +11,7 @@ def handle_keywords(file, row):
 
     # 检查 'translate_keywords' 列是否存在
     if row not in keywords_data.columns:
-        print("DataFrame 中不存在 'translate_keywords' 列。")
+        print("DataFrame 中不存在对应列。")
         return
 
     # 创建一个新的列表来存储清理过的关键词列表

@@ -33,8 +33,8 @@ def get_most_similar_position_id_list(position_keywords, test_keywords):
         for position_keyword in position_keywords:
             # 计算test和每个position的相似度
             similarity = nltk.translate.bleu_score.sentence_bleu(
-                [[a_word for phrase in position_keyword for a_word in phrase.split()]],
-                [a_word for phrase in test_keyword for a_word in phrase.split()])
+                [[word for phrase in position_keyword for word in phrase.split()]],
+                [word for phrase in test_keyword for word in phrase.split()])
             similarity_list.append(similarity)
 
         most_similar_position_list.append(find_top_similar_job_list(similarity_list))
@@ -64,10 +64,10 @@ def get_result():
     # 将id列表转换为职位名列表
     result_data = []
     for job_id_list in result_id_list:
-        test_prediction = []
+        test_prediction_list = []
         for job_id in job_id_list:
-            test_prediction.append(position_keywords_data[job_id]['position_name'])
-        result_data.append(test_prediction)
+            test_prediction_list.append(position_keywords_data[job_id]['position_name'])
+        result_data.append(test_prediction_list)
 
     pd.Series(result_data).to_csv(result_file)
 
