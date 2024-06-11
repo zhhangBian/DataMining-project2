@@ -32,9 +32,9 @@ def get_most_similar_position_id_list(position_keywords, test_keywords):
 
         for position_keyword in position_keywords:
             # 计算test和每个position的相似度
-            similarity = nltk.translate.bleu_score.sentence_bleu(
-                [[word for phrase in position_keyword for word in phrase.split()]],
-                [word for phrase in test_keyword for word in phrase.split()])
+            position_words = [sorted([word.lower() for phrase in position_keyword for word in phrase.split()])]
+            test_words = sorted(word.lower() for phrase in test_keyword for word in phrase.split())
+            similarity = nltk.translate.bleu_score.sentence_bleu(position_words, test_words)
             similarity_list.append(similarity)
 
         most_similar_position_list.append(find_top_similar_job_list(similarity_list))
@@ -65,14 +65,14 @@ def get_result_id_list():
 
 def get_result():
     position_keywords_data = pd.read_csv(position_keywords_file)
-    # result_id_list = get_result_id_list()
-    result_id_list = pd.read_csv("./data/result_id_list.csv")
+    result_id_list = get_result_id_list()
+    # result_id_list = pd.read_csv("./data/result_id_list.csv")
 
     # 将id列表转换为职位名列表
     result_data = []
-    for job_id_list in result_id_list["id_list"]:
+    for job_id_list in result_id_list:
         test_prediction_list = []
-        for job_id in ast.literal_eval(job_id_list):
+        for job_id in job_id_list:
             test_prediction_list.append(position_keywords_data.loc[job_id, 'position_name'])
         result_data.append(test_prediction_list)
 
@@ -81,3 +81,4 @@ def get_result():
 
 if __name__ == "__main__":
     get_result()
+    # get_result_id_list()
