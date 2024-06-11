@@ -35,6 +35,9 @@ def get_similarity(test_keywords, position_keywords):
     for test_word in test_keywords:
         priority_position = 1
         for position_word in position_keywords:
+            if test_word == position_word:
+                similarity_sum += 2
+
             # 计算test和每个position的相似度
             test_list = [word for word in test_word.split()]
             position_list = [word for word in position_word.split()]
