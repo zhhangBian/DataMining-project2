@@ -2,69 +2,74 @@ import nltk
 from tqdm import tqdm
 import pandas as pd
 import ast
+import heapq
 
 position_keywords_file = "./data/position_keywords.csv"
 test_keywords_file = "./data/test_keywords.csv"
+result_id_file = "./data/result_id_list.csv"
 result_file = "data/result.csv"
 
 
+# 获取相似度最大的职业的索引列表
 def find_top_similar_job_list(similarity_list, num=10):
     job_index_list = []
-    reflect = {}
-    for i in range(len(similarity_list)):
-        reflect[similarity_list[i]] = i
 
-    similarity_list.sort(reverse=True)
-    for i in range(num):
-        job_index_list.append(reflect[similarity_list[i]])
+    # 使用最大堆找到相似度列表中最大的 num 个元素及其索引
+    top_similarities = heapq.nlargest(num, zip(similarity_list, range(len(similarity_list))))
+
+    # 从找到的元素中获取索引
+    for similarity, index in top_similarities:
+        job_index_list.append(index)
+
     return job_index_list
 
 
-def get_most_similar_words(keyword_list, fac_targets):
-    result = []
-    for target in tqdm(fac_targets):
+# 找到相似度最大的职业
+def get_most_similar_position_id_list(position_keywords, test_keywords):
+    most_similar_position_list = []
+    for test_keyword in tqdm(test_keywords):
         similarity_list = []
-        for my_word in keyword_list:
+
+        for position_keyword in position_keywords:
+            # 计算test和每个position的相似度
             similarity = nltk.translate.bleu_score.sentence_bleu(
-                [[a_word for phrase in my_word for a_word in phrase.split()]],
-                [a_word for phrase in target for a_word in phrase.split()])
+                [[a_word for phrase in position_keyword for a_word in phrase.split()]],
+                [a_word for phrase in test_keyword for a_word in phrase.split()])
             similarity_list.append(similarity)
-            print(str(target) + " " + str(my_word) + " " + str(similarity))
-            similarity_list.append(similarity)
-        result.append(find_top_similar_job_list(similarity_list))
-    return result
+
+        most_similar_position_list.append(find_top_similar_job_list(similarity_list))
+    return most_similar_position_list
 
 
 def get_result():
     position_keywords_data = pd.read_csv(position_keywords_file)
-
-    key_words_list = []
-
-    select_row = position_keywords_data.loc[:, ['job_keywords',
-                                                'translate_keywords',
-                                                'position_name']]
-    for row in select_row.to_dict('records'):
-        # 转换类型为列表
-        job_keywords_list_en = ast.literal_eval(row['translate_keywords'])
-        key_words_list.append(job_keywords_list_en)
-
     test_keywords_data = pd.read_csv(test_keywords_file)
 
-    targets = []
-    position_name_list = position_keywords_data.loc[:, 'position_name'].tolist()
-    for row in test_keywords_data.to_dict('records'):
-        targets.append(ast.literal_eval(row['translate_keywords']))
+    position_keywords_list = []
+    test_keyword_list = []
 
-    most_similarity_list = get_most_similar_words(key_words_list, targets)
+    # 将职位对应的关键词组成一个列表
+    for position_row in position_keywords_data.to_dict('records'):
+        position_keywords_list.append(ast.literal_eval(position_row['translate_keywords']))
 
+    # 将测试职位对应的关键词组成一个列表
+    for test_row in test_keywords_data.to_dict('records'):
+        test_keyword_list.append(ast.literal_eval(test_row['translate_keywords']))
+
+    # 通过相似度计算最匹配的id列表
+    result_id_list = get_most_similar_position_id_list(position_keywords_list,
+                                                       test_keyword_list)
+    pd.Series(result_id_list).to_csv(result_id_file)
+
+    # 将id列表转换为职位名列表
     result_data = []
-    for job_id_list in most_similarity_list:
+    for job_id_list in result_id_list:
         test_prediction = []
         for job_id in job_id_list:
-            test_prediction.append(position_name_list[job_id])
+            test_prediction.append(position_keywords_data[job_id]['position_name'])
         result_data.append(test_prediction)
 
-    # pd.Series(result_data).to_csv(result_file)
+    pd.Series(result_data).to_csv(result_file)
 
 
 if __name__ == "__main__":
