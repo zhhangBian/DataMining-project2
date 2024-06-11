@@ -41,7 +41,7 @@ def get_most_similar_position_id_list(position_keywords, test_keywords):
     return most_similar_position_list
 
 
-def get_result():
+def get_result_id_list():
     position_keywords_data = pd.read_csv(position_keywords_file)
     test_keywords_data = pd.read_csv(test_keywords_file)
 
@@ -60,13 +60,20 @@ def get_result():
     result_id_list = get_most_similar_position_id_list(position_keywords_list,
                                                        test_keyword_list)
     pd.Series(result_id_list).to_csv(result_id_file)
+    return result_id_list
+
+
+def get_result():
+    position_keywords_data = pd.read_csv(position_keywords_file)
+    # result_id_list = get_result_id_list()
+    result_id_list = pd.read_csv("./data/result_id_list.csv")
 
     # 将id列表转换为职位名列表
     result_data = []
-    for job_id_list in result_id_list:
+    for job_id_list in result_id_list["id_list"]:
         test_prediction_list = []
-        for job_id in job_id_list:
-            test_prediction_list.append(position_keywords_data[job_id]['position_name'])
+        for job_id in ast.literal_eval(job_id_list):
+            test_prediction_list.append(position_keywords_data.loc[job_id, 'position_name'])
         result_data.append(test_prediction_list)
 
     pd.Series(result_data).to_csv(result_file)
