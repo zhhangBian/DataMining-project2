@@ -20,15 +20,17 @@ def find_top_similar_job_list(similarity_list, num=10):
     return job_index_list
 
 
-def get_most_similar_words(fac_key_words, fac_targets):
+def get_most_similar_words(keyword_list, fac_targets):
     result = []
     for target in tqdm(fac_targets):
         similarity_list = []
-        for my_word in fac_key_words:
-            similarity_list.append(nltk.translate.bleu_score.sentence_bleu(
+        for my_word in keyword_list:
+            similarity = nltk.translate.bleu_score.sentence_bleu(
                 [[a_word for phrase in my_word for a_word in phrase.split()]],
                 [a_word for phrase in target for a_word in phrase.split()])
-            )
+            similarity_list.append(similarity)
+            print(str(target) + " " + str(my_word) + " " + str(similarity))
+            similarity_list.append(similarity)
         result.append(find_top_similar_job_list(similarity_list))
     return result
 
@@ -62,7 +64,7 @@ def get_result():
             test_prediction.append(position_name_list[job_id])
         result_data.append(test_prediction)
 
-    pd.Series(result_data).to_csv(result_file)
+    # pd.Series(result_data).to_csv(result_file)
 
 
 if __name__ == "__main__":
