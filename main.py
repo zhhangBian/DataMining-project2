@@ -8,7 +8,7 @@ from get_test_keywords import get_test_keywords
 
 def main():
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    # 跑一次要很久，不要轻易运行!!!!!!!!
+    # 跑一次要很久，不要轻易运行!!!!!!!!!!
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # 获取工作的简化描述
     get_job_description_summary()

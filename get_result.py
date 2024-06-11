@@ -1,4 +1,5 @@
 import nltk
+from nltk.translate.bleu_score import SmoothingFunction
 from tqdm import tqdm
 import pandas as pd
 import ast
@@ -29,19 +30,26 @@ def get_similarity(test_keywords, position_keywords):
     position_word_num = len(position_keywords)
 
     similarity_sum = 0
+
+    priority_test = 1
     for test_word in test_keywords:
-        sum = 0
+        priority_position = 1
         for position_word in position_keywords:
             # 计算test和每个position的相似度
             test_list = [word for word in test_word.split()]
-            position_list = [[word for word in position_word.split()]]
+            position_list = [word for word in position_word.split()]
 
-            similarity = nltk.translate.bleu_score.sentence_bleu(position_list, test_list)
-            sum += similarity
+            similarity = (nltk.translate.bleu_score.
+                          sentence_bleu([position_list], test_list,
+                                        smoothing_function=SmoothingFunction().method2))
+            similarity_sum += similarity * priority_position * priority_test
+            # 后续的词降低权重
+            priority_position -= 1 / position_word_num
 
-        similarity_sum += sum / position_word_num
+        # 后续的词降低权重
+        priority_test -= 1 / test_word_num
 
-    return similarity_sum / test_word_num
+    return similarity_sum / (test_word_num * position_word_num)
 
 
 # 找到相似度最大的职业
