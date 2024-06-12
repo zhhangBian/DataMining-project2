@@ -3,10 +3,15 @@ from gensim.models import Word2Vec
 import requests
 import json
 
+key_file_name = 'data/nanbeige_key.txt'
+
+with open(key_file_name, 'r', encoding='utf-8') as key_file:
+    key = key_file.read().splitlines()
+
 url = "https://stardustlm.zhipin.com/api/gpt/open/chat/openai/send/msg"
 headers = {
     'Content-Type': 'application/json',
-    'Authorization': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IiIsInV1aWQiOiJuYmdfY3NsX3BhcnRuZXJfcGxheWVyOS02NTkzNDhlZS1lZDcyLTQxZGEtYWYwZi05N2E2MGE1MGExMGUifQ.9hTvhNxwncrLvVPG-utFFdUmZDNXA3YmvkWl-RGDJm8'
+    'Authorization': key
 }
 
 fail_hint = "failed!!!"
