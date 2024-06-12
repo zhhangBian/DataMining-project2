@@ -36,7 +36,7 @@ def get_similarity(test_keywords, position_keywords):
         priority_position = 1
         for position_word in position_keywords:
             if test_word == position_word:
-                similarity_sum += 2
+                return 100
 
             # 计算test和每个position的相似度
             test_list = [word for word in test_word.split()]
@@ -52,7 +52,7 @@ def get_similarity(test_keywords, position_keywords):
         # 后续的词降低权重
         priority_test -= 1 / test_word_num
 
-    return 100 * similarity_sum / ((test_word_num + 1) * (position_word_num + 1))
+    return 400 * similarity_sum / ((test_word_num + 1) * (position_word_num + 1))
 
 
 # 找到相似度最大的职业
