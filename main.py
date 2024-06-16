@@ -14,7 +14,7 @@ def main():
     get_job_description_summary()
     # 获取职位和一二级职位的关键词
     get_job_keywords()
-    # get_secondary_keywords()
+    get_secondary_keywords()
     # 获取测试数据中的关键词
     get_test_keywords()
     # 生成结果
